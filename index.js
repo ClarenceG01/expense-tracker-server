@@ -1,15 +1,19 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
+
 const { userRoute } = require("./src/routes/User");
+const { expenseRoute } = require("./src/routes/Expense");
 
 const app = express();
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 9000;
 
 app.use(express.json());
 app.use(cors());
-app.use(userRoute);
+app.use(cookieParser());
+app.use(userRoute, expenseRoute);
 async function main() {
   await mongoose
     .connect(
