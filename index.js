@@ -20,7 +20,10 @@ async function main() {
       `mongodb+srv://${process.env.MONGOOSE_USERNAME}:${process.env.MONGOOSE_PASSWORD}@cluster0.cwzfsum.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
     )
     .then(() => console.log("connected to database"))
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.log(err);
+      console.log("could not connect to database");
+    });
   app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
   });
