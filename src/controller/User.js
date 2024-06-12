@@ -31,12 +31,13 @@ async function login(req, res) {
       const pwdFromDb = userExists.password;
       const isMatch = await bcrypt.compare(password, pwdFromDb);
       if (isMatch) {
-        const token = jwt.sign({ userExists }, process.env.JWT_SECRET, {
-          expiresIn: "1h",
-        });
+        const token = jwt.sign({ userExists }, process.env.JWT_SECRET);
         res
           .cookie("token", token, {
-            httpOnly: true,
+            httpOnly: false,
+            sameSite: "none",
+            secure: true,
+            maxAge: 24 * 60 * 60 * 1000,
           })
           .status(200)
           .json({ message: "Login Successful" });
