@@ -67,7 +67,10 @@ async function getTopExpenses(req, res) {
       .find({ userId: userObjectId })
       .sort({ amount: -1 })
       .limit(5);
-    console.log(topExpenses);
+    res.status(200).json({
+      message: "Top expenses retrieved",
+      topExpenses,
+    });
   } catch (error) {
     console.log(error);
   }
