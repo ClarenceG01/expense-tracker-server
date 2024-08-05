@@ -21,6 +21,18 @@ app.use(
     credentials: true,
   })
 );
+app.options(
+  "*",
+  cors({
+    origin: [
+      "https://expensify-lac.vercel.app",
+      "http://localhost:5173",
+      "https://expensifvg.netlify.app",
+    ],
+    credentials: true,
+  })
+);
+
 app.use(cookieParser());
 app.use(userRoute, expenseRoute);
 async function main() {
