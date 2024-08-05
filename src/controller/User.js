@@ -34,8 +34,8 @@ async function login(req, res) {
         const token = jwt.sign({ userExists }, process.env.JWT_SECRET);
         res
           .cookie("token", token, {
-            httpOnly: true,
-            sameSite: "None",
+            httpOnly: false,
+            sameSite: "none",
             secure: true,
             maxAge: 24 * 60 * 60 * 1000,
           })
