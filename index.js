@@ -35,6 +35,9 @@ app.options(
 
 app.use(cookieParser());
 app.use(userRoute, expenseRoute);
+app.get("/", (req, res) => {
+  res.send("Hello from express");
+});
 async function main() {
   await mongoose
     .connect(
