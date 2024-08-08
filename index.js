@@ -11,10 +11,12 @@ const app = express();
 const port = process.env.PORT || 9000;
 
 app.use(express.json());
-// enable cors from all origins
 app.use(
   cors({
-    origin: true,
+    origin: [
+      "http://localhost:9000",
+      "https://66b4c180a013ae0738193424--dynamic-marigold-630e73.netlify.app/",
+    ],
     credentials: true,
   })
 );
