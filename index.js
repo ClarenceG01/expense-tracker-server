@@ -13,8 +13,10 @@ const port = process.env.PORT || 9000;
 app.use(express.json());
 app.use(
   cors({
-    origin:
-      "https://66b4c180a013ae0738193424--dynamic-marigold-630e73.netlify.app", // Your Netlify domain
+    origin: [
+      "https://66b4c180a013ae0738193424--dynamic-marigold-630e73.netlify.app",
+      "http://localhost:5173",
+    ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true, // Allow credentials (cookies, etc.)
