@@ -11,27 +11,26 @@ const app = express();
 const port = process.env.PORT || 9000;
 
 app.use(express.json());
+const allowedOrigins = [
+  "https://expensifvg.netlify.app",
+  "https://expensify-lac.vercel.app",
+  "http://localhost:5173",
+];
+
 app.use(
   cors({
-    origin: [
-      "https://expensify-lac.vercel.app",
-      "http://localhost:5173",
-      "https://expensifvg.netlify.app/",
-    ],
-    credentials: true,
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true, // If you are sending cookies or authorization headers
   })
 );
-app.options(
-  "*",
-  cors({
-    origin: [
-      "https://expensify-lac.vercel.app",
-      "http://localhost:5173",
-      "https://expensifvg.netlify.app",
-    ],
-    credentials: true,
-  })
-);
+
+app.options("*", cors());
 
 app.use(cookieParser());
 app.use(userRoute, expenseRoute);
