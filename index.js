@@ -13,14 +13,22 @@ const port = process.env.PORT || 9000;
 app.use(express.json());
 app.use(
   cors({
-    origin: ["https://expensifvg.netlify.app", "http://localhost:5173"],
+    origin: [
+      "https://expensifvg.netlify.app",
+      "http://localhost:5173",
+      "https://expensify-lac.vercel.app",
+    ],
     credentials: true,
   })
 );
 app.options(
   "*",
   cors({
-    origin: ["https://expensifvg.netlify.app", "http://localhost:5173"],
+    origin: [
+      "https://expensifvg.netlify.app",
+      "http://localhost:5173",
+      "https://expensify-lac.vercel.app",
+    ],
     credentials: true,
   })
 );
