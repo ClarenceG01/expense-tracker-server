@@ -17,6 +17,7 @@ app.use(
       "https://expensifvg.netlify.app",
       "http://localhost:5173",
       "https://expensify-lac.vercel.app",
+      "https://expensify-ryg3.onrender.com",
     ],
     credentials: true,
   })
