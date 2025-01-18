@@ -17,59 +17,45 @@ async function addExpense(req, res) {
     console.log(error);
   }
 }
-async function getRecentExpense(req, res) {
-  try {
-    const recentExpenses = await expenseModel
-      .find({ userId: req.user._id })
-      .sort({ date: -1 });
-    res.status(200).json({
-      message: "Recent expenses fetched successfully",
-      recentExpenses,
-    });
-  } catch (error) {
-    console.log(error);
-  }
-}
-async function getExpenseTotal(req, res) {
-  try {
-    // Convert userId to ObjectId
-    const userObjectId = new mongoose.Types.ObjectId(req.user._id);
 
+async function getDashboardData(req, res) {
+  try {
+    // Total expenses
+    const userObjectId = new mongoose.Types.ObjectId(req.user._id);
     // Check if there are any expenses for this user
     const expenses = await expenseModel.find({ userId: userObjectId });
 
+    let totalExpenses;
+
     if (expenses.length === 0) {
-      return res
-        .status(200)
-        .json({ message: "Total fetched successfully", total: 0 });
+      console.log("No expenses found");
+      totalExpenses = 0; // Set to 0 when no expenses
+    } else {
+      // Aggregate to get the total amount
+      const total = await expenseModel.aggregate([
+        { $match: { userId: userObjectId } },
+        { $group: { _id: null, totalAmount: { $sum: "$amount" } } },
+      ]);
+
+      // Assign the totalAmount value to totalExpenses
+      totalExpenses = total.length > 0 ? total[0].totalAmount : 0;
     }
 
-    // Aggregate to get the total amount
-    const total = await expenseModel.aggregate([
-      { $match: { userId: userObjectId } },
-      { $group: { _id: null, totalAmount: { $sum: "$amount" } } },
-    ]);
-    const { totalAmount } = total[0];
-
-    res
-      .status(200)
-      .json({ message: "Total fetched successfully", total: totalAmount });
-  } catch (error) {
-    console.error("Error fetching total:", error);
-    res.status(500).json({ message: "An error occurred", error });
-  }
-}
-async function getTopExpenses(req, res) {
-  try {
-    const userObjectId = new mongoose.Types.ObjectId(req.user._id);
-    //get all expenses and sort by amount then limit to 5
+    // top expenses
     const topExpenses = await expenseModel
       .find({ userId: userObjectId })
       .sort({ amount: -1 })
       .limit(5);
+    // recent expenses
+    const recentExpenses = await expenseModel
+      .find({ userId: userObjectId })
+      .sort({ date: -1 })
+      .limit(5);
     res.status(200).json({
-      message: "Top expenses retrieved",
+      message: "Dashboard data retrieved",
+      total: totalExpenses,
       topExpenses,
+      recentExpenses,
     });
   } catch (error) {
     console.log(error);
@@ -77,7 +63,5 @@ async function getTopExpenses(req, res) {
 }
 module.exports = {
   addExpense,
-  getRecentExpense,
-  getExpenseTotal,
-  getTopExpenses,
+  getDashboardData,
 };

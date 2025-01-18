@@ -26,7 +26,6 @@ async function login(req, res) {
   const { username, password } = req.body;
   try {
     const loggingUser = await userModel.findOne({ username });
-    console.log(username, password)
     if (loggingUser) {
       const pwdFromDb = loggingUser.password;
       const isMatch = await bcrypt.compare(password, pwdFromDb);
@@ -34,9 +33,10 @@ async function login(req, res) {
         const token = jwt.sign({ loggingUser }, process.env.JWT_SECRET);
         res
           .cookie("token", token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "none",
+            httpOnly: false,
+            sameSite: "None",
+            secure: false,
+            maxAge: 24 * 60 * 60 * 1000,
           })
           .status(200)
           .json({ message: "Login Successful" });
