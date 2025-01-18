@@ -41,9 +41,11 @@ app.get("/", (req, res) => {
   res.send("Hello from express");
 });
 async function main() {
+  console.log(process.env.MONGOOSE_PASSWORD);
+    console.log(process.env.MONGOOSE_USERNAME);
   await mongoose
     .connect(
-      `mongodb+srv://${process.env.MONGOOSE_USERNAME}:${process.env.MONGOOSE_PASSWORD}@cluster0.cwzfsum.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
+      `mongodb+srv://${process.env.MONGOOSE_USERNAME}:${process.env.MONGOOSE_PASSWORD}@cluster0.1x1e4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
     )
     .then(() => console.log("connected to database"))
     .catch((err) => {

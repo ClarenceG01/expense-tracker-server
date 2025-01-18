@@ -3,20 +3,19 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 async function registerUser(req, res) {
-  const { username, email, password } = req.body;
+  const { username, password } = req.body;
   try {
-    const user = await userModel.findOne({ email: email });
+    const user = await userModel.findOne({ username: username });
     if (user) {
-      res.status(400).json({ message: "Email already exists" });
+      res.status(400).json({ message: "Username already in use" });
     } else {
       const hashedPwd = await bcrypt.hash(password, 8);
-      console.log(hashedPwd);
-      const user = new userModel({
+      const newUser = new userModel({
         username,
-        email,
         password: hashedPwd,
       });
-      await user.save();
+      await newUser.save();
+      console.log(newUser._id)
       res.status(200).json({ message: "User registered successfully" });
     }
   } catch (error) {
@@ -24,27 +23,29 @@ async function registerUser(req, res) {
   }
 }
 async function login(req, res) {
-  const { email, password } = req.body;
+  const { username, password } = req.body;
   try {
-    const userExists = await userModel.findOne({ email });
-    if (userExists) {
-      const pwdFromDb = userExists.password;
+    const loggingUser = await userModel.findOne({ username });
+    console.log(username, password)
+    if (loggingUser) {
+      const pwdFromDb = loggingUser.password;
       const isMatch = await bcrypt.compare(password, pwdFromDb);
       if (isMatch) {
-        const token = jwt.sign({ userExists }, process.env.JWT_SECRET);
+        const token = jwt.sign({ loggingUser }, process.env.JWT_SECRET);
         res
           .cookie("token", token, {
-            httpOnly: false,
-            sameSite: "None",
+            httpOnly: true,
             secure: true,
-            maxAge: 24 * 60 * 60 * 1000,
+            sameSite: "none",
           })
           .status(200)
           .json({ message: "Login Successful" });
       } else {
+        // wrong password
         res.status(400).json({ message: "invalid password" });
       }
     } else {
+      console.log('user not found')
       res.status(400).json({ message: "User not found" });
     }
   } catch (error) {
