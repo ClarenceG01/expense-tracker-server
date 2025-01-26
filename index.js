@@ -25,12 +25,7 @@ app.use(
 app.options(
   "*",
   cors({
-    origin: [
-      "https://expensifvg.netlify.app",
-      "http://localhost:5173",
-      "https://expensify-lac.vercel.app",
-      "https://expensify-ryg3.onrender.com",
-    ],
+    origin: "http://localhost:5173",
     credentials: true,
   })
 );
@@ -41,8 +36,6 @@ app.get("/", (req, res) => {
   res.send("Hello from express");
 });
 async function main() {
-  console.log(process.env.MONGOOSE_PASSWORD);
-    console.log(process.env.MONGOOSE_USERNAME);
   await mongoose
     .connect(
       `mongodb+srv://${process.env.MONGOOSE_USERNAME}:${process.env.MONGOOSE_PASSWORD}@cluster0.1x1e4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`

@@ -15,7 +15,7 @@ async function registerUser(req, res) {
         password: hashedPwd,
       });
       await newUser.save();
-      console.log(newUser._id)
+      console.log(newUser._id);
       res.status(200).json({ message: "User registered successfully" });
     }
   } catch (error) {
@@ -33,8 +33,8 @@ async function login(req, res) {
         const token = jwt.sign({ loggingUser }, process.env.JWT_SECRET);
         res
           .cookie("token", token, {
-            httpOnly: false,
-            sameSite: "None",
+            httpOnly: true,
+            sameSite: "Strict",
             secure: false,
             maxAge: 24 * 60 * 60 * 1000,
           })
@@ -45,12 +45,38 @@ async function login(req, res) {
         res.status(400).json({ message: "invalid password" });
       }
     } else {
-      console.log('user not found')
+      console.log("user not found");
       res.status(400).json({ message: "User not found" });
     }
   } catch (error) {
     console.log(error);
   }
 }
+async function checkAuth(req, res) {
+  try {
+    const token = req.cookies.token;
+    console.log(token);
+    if (!token)
+      return res.status(401).json({
+        authenticated: false,
+        message: "Unauthorized",
+      });
 
-module.exports = { registerUser, login };
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(verified);
+    if (verified) {
+      return res.status(200).json({
+        authenticated: true,
+        message: "Authorized",
+        user: verified.loggingUser,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(401).json({
+      authenticated: false,
+      message: "Unauthorized",
+    });
+  }
+}
+module.exports = { registerUser, login, checkAuth };
