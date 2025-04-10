@@ -1,7 +1,8 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const cors = require("cors");
-const cookieParser = require("cookie-parser");
+const mongoose = require("mongoose");
+const session = require("express-session");
+const { authenticateSession } = require("./src/middleware/authenticate");
 
 const { userRoute } = require("./src/routes/User");
 const { expenseRoute } = require("./src/routes/Expense");
@@ -9,19 +10,31 @@ const { expenseRoute } = require("./src/routes/Expense");
 const app = express();
 
 const port = process.env.PORT || 9000;
-
+// middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
     origin: "http://localhost:5173",
     credentials: true,
   })
 );
-
-app.use(cookieParser());
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      httpOnly: true,
+      secure: false,
+    },
+  })
+);
 app.use(userRoute, expenseRoute);
-app.get("/", (req, res) => {
-  res.send("Hello from express");
+
+app.get("/", authenticateSession, (req, res) => {
+  res.send("Home");
 });
 async function main() {
   await mongoose

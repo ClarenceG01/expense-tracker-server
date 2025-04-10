@@ -21,14 +21,11 @@ async function addExpense(req, res) {
 async function getDashboardData(req, res) {
   try {
     // Total expenses
-    const userObjectId = new mongoose.Types.ObjectId(req.user._id);
+    const userObjectId = new mongoose.Types.ObjectId(req.session.user.id);
     // Check if there are any expenses for this user
     const expenses = await expenseModel.find({ userId: userObjectId });
-
     let totalExpenses;
-
     if (expenses.length === 0) {
-      console.log("No expenses found");
       totalExpenses = 0; // Set to 0 when no expenses
     } else {
       // Aggregate to get the total amount
@@ -36,11 +33,9 @@ async function getDashboardData(req, res) {
         { $match: { userId: userObjectId } },
         { $group: { _id: null, totalAmount: { $sum: "$amount" } } },
       ]);
-
       // Assign the totalAmount value to totalExpenses
       totalExpenses = total.length > 0 ? total[0].totalAmount : 0;
     }
-
     // top expenses
     const topExpenses = await expenseModel
       .find({ userId: userObjectId })
@@ -52,7 +47,7 @@ async function getDashboardData(req, res) {
       .sort({ date: -1 })
       .limit(5);
     res.status(200).json({
-      message: "Dashboard data retrieved",
+      message: "Dashboard data fetched successfully",
       total: totalExpenses,
       topExpenses,
       recentExpenses,

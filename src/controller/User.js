@@ -1,6 +1,5 @@
 const { userModel } = require("../models/UserModel");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 
 async function registerUser(req, res) {
   const { username, password } = req.body;
@@ -26,55 +25,28 @@ async function login(req, res) {
   const { username, password } = req.body;
   try {
     const loggingUser = await userModel.findOne({ username });
-    if (loggingUser) {
-      const pwdFromDb = loggingUser.password;
-      const isMatch = await bcrypt.compare(password, pwdFromDb);
-      if (isMatch) {
-        const token = jwt.sign({ loggingUser }, process.env.JWT_SECRET);
-        res
-          .cookie("token", token, {
-            httpOnly: true,
-            maxAge: 24 * 60 * 60 * 1000,
-          })
-          .status(200)
-          .json({ message: "Login Successful" });
-      } else {
-        // wrong password
-        res.status(400).json({ message: "invalid password" });
-      }
-    } else {
-      console.log("user not found");
-      res.status(400).json({ message: "User not found" });
+    const isMatch = await bcrypt.compare(password, loggingUser.password);
+    if (!loggingUser || !isMatch) {
+      return res.status(400).json({ message: "Invalid credentials" });
     }
+    req.session.user = {
+      id: loggingUser._id,
+      username: loggingUser.username,
+    };
+
+    res.status(200).json({
+      message: "Login successful",
+      user: req.session.user,
+    });
   } catch (error) {
     console.log(error);
   }
 }
 async function checkAuth(req, res) {
-  try {
-    const token = req.cookies.token;
-    console.log(token);
-    if (!token)
-      return res.status(401).json({
-        authenticated: false,
-        message: "Unauthorized",
-      });
-
-    const verified = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(verified);
-    if (verified) {
-      return res.status(200).json({
-        authenticated: true,
-        message: "Authorized",
-        user: verified.loggingUser,
-      });
-    }
-  } catch (error) {
-    console.log(error);
-    return res.status(401).json({
-      authenticated: false,
-      message: "Unauthorized",
-    });
+  if (req.session.user) {
+    res.json({ authenticated: true, user: req.session.user });
+  } else {
+    res.status(401).json({ message: "Unauthorized" });
   }
 }
 module.exports = { registerUser, login, checkAuth };

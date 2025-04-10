@@ -1,19 +1,8 @@
-const jwt = require("jsonwebtoken");
-
-const authenticateToken = (req, res, next) => {
-  try {
-    const token = req.cookies.token;
-
-    if (!token) return res.status(401).json({ message: "Unauthorized" });
-
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-      if (err) return res.status(403).json({ message: "Forbidden" });
-      req.user = user.loggingUser;
-      next();
-    });
-  } catch (error) {
-    console.log(error)
+const authenticateSession = (req, res, next) => {
+  if (!req.session.user) {
+    return res.status(401).json({ message: "Unauthorized" });
   }
+  next();
 };
 
-module.exports = { authenticateToken };
+module.exports = { authenticateSession };

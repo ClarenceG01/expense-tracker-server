@@ -1,13 +1,10 @@
-const {
-  addExpense,
-  getDashboardData,
-} = require("../controller/Expense");
-const { authenticateToken } = require("../middleware/authenticate");
+const { addExpense, getDashboardData } = require("../controller/Expense");
+const { authenticateSession } = require("../middleware/authenticate");
 
 const expenseRoute = require("express").Router();
 
-expenseRoute.post("/expense", authenticateToken, addExpense);
+expenseRoute.post("/expense", authenticateSession, addExpense);
 
-expenseRoute.get("/dashboard", authenticateToken, getDashboardData);
+expenseRoute.get("/dashboard", authenticateSession, getDashboardData);
 
 module.exports = { expenseRoute };
