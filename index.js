@@ -44,9 +44,7 @@ app.get("/", authenticateSession, (req, res) => {
 });
 async function main() {
   await mongoose
-    .connect(
-      `mongodb+srv://${process.env.MONGOOSE_USERNAME}:${process.env.MONGOOSE_PASSWORD}@cluster0.1x1e4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
-    )
+    .connect(`${process.env.MONGO_URI}`)
     .then(() => console.log("connected to database"))
     .catch((err) => {
       console.log(err);
