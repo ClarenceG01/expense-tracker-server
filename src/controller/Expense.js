@@ -9,7 +9,7 @@ async function addExpense(req, res) {
       date: new Date(),
       userDate,
       notes,
-      userId: req.user._id,
+      userId: req.session.user._id,
     });
     await newExpense.save();
     res.status(200).json({ message: "Expense added successfully" });
