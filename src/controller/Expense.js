@@ -1,5 +1,6 @@
 const { expenseModel } = require("../models/ExpenseModel");
 const mongoose = require("mongoose");
+
 async function addExpense(req, res) {
   const { title, amount, userDate, notes } = req.body;
   try {
@@ -9,19 +10,20 @@ async function addExpense(req, res) {
       date: new Date(),
       userDate,
       notes,
-      userId: req.session.user._id,
+      userId: req.user.id,
     });
     await newExpense.save();
     res.status(200).json({ message: "Expense added successfully" });
   } catch (error) {
     console.log(error);
+    res.status(500).json({ message: "Internal server error" });
   }
 }
 
 async function getDashboardData(req, res) {
   try {
     // Total expenses
-    const userObjectId = new mongoose.Types.ObjectId(req.session.user.id);
+    const userObjectId = new mongoose.Types.ObjectId(req.user.id);
     // Check if there are any expenses for this user
     const expenses = await expenseModel.find({ userId: userObjectId });
     let totalExpenses;
