@@ -27,9 +27,14 @@ async function login(req, res) {
     const { username, password } = req.body;
     // find user
     const user = await userModel.findOne({ username });
+    if (!user) {
+      return res.status(400).json({
+        message: "User not found",
+      });
+    }
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!user || !isMatch) {
-      return res.status(400).json({ message: "Invalid credentials" });
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid credentials" });
     }
     req.user = { id: user._id, username: user.username };
     const token = jwt.sign(
