@@ -53,6 +53,7 @@ async function getDashboardData(req, res) {
       total: totalExpenses,
       topExpenses,
       recentExpenses,
+      username: req.user.username,
     });
   } catch (error) {
     console.log(error);

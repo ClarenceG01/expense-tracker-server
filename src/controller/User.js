@@ -31,10 +31,17 @@ async function login(req, res) {
     if (!user || !isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
-    req.user = user;
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "24h",
-    });
+    req.user = { id: user._id, username: user.username };
+    const token = jwt.sign(
+      {
+        id: user._id,
+        username: user.username,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "24h",
+      }
+    );
     // set token in cookie
     res
       .cookie("token", token, {
@@ -62,7 +69,10 @@ async function checkAuth(req, res) {
   }
 }
 async function logout(req, res) {
-  res.clearCookie("token"); 
-  res.status(200).json({ message: "Logout successful" });
+  res.clearCookie("token");
+  res.status(200).json({
+    message: "Logout successful",
+    redirect: "/",
+  });
 }
 module.exports = { registerUser, login, checkAuth, logout };
